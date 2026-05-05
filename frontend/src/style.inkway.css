@@ -1,0 +1,1181 @@
+/* ============================================================
+   一人公司 Agent · 「Claude 工艺」浅色暖米白 v2.0
+   ──────────────────────────────────────────────────────────
+   彻底推翻 v1 墨道(深色), 按 Claude.ai 官方设计系统重写
+   核心 token:
+     - Parchment 米色 #f5f4ed (Anthropic 同款)
+     - Terracotta 暖橙 #c96442 (品牌唯一彩色)
+     - Olive Gray / Stone Gray (全暖灰中性色)
+     - Anthropic Serif → Fraunces fallback
+     - Ring Shadow 0px 0px 0px 1px (Claude 标志性假边框)
+   科技工艺(CEO 加的"一点点"):
+     - JetBrains Mono uppercase eyebrow
+     - 微妙网格点阵背景层
+     - 数字用 tabular-nums 等宽
+     - 几何八角星 logo
+   ============================================================ */
+
+/* ===== 字体 · 全 Google Fonts 兜底,无私有字体依赖 ===== */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+/* ============================================================
+   1. :root · Claude.ai 暖米白 token 全套
+============================================================ */
+:root {
+  /* 颠倒原 style.css 的浅色变量为 Claude 暖米白 */
+  color: #141413 !important;
+  --text: #141413 !important;
+  --muted: #5e5d59 !important;
+  --muted-soft: #87867f !important;
+  --panel: #faf9f5 !important;
+  --panel-strong: #ffffff !important;
+  --border: #f0eee6 !important;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.05) !important;
+  --dark: #141413 !important;
+  --blue: #3898ec !important;
+  --violet: #c96442 !important;  /* 紫 → Terracotta */
+  --green: #6f8e5f !important;
+
+  /* ===== Claude 同款 token ===== */
+  /* 表面 */
+  --c-parchment: #f5f4ed;       /* 主背景米色 */
+  --c-ivory:     #faf9f5;       /* 卡片底 */
+  --c-white:     #ffffff;       /* 最白(按钮/特殊) */
+  --c-warm-sand: #e8e6dc;       /* 暖砂(交互背景) */
+  --c-dark:      #141413;       /* 暗节背景 */
+  --c-dark-surface: #30302e;    /* 暗节表面 */
+
+  /* 边线 · 几乎不可见的暖奶油 */
+  --c-border:        #f0eee6;
+  --c-border-warm:   #e8e6dc;
+  --c-border-dark:   #30302e;
+  --c-ring-warm:     #d1cfc5;
+  --c-ring-deep:     #c2c0b6;
+
+  /* 文字 · 全暖灰 */
+  --c-near-black:   #141413;
+  --c-charcoal:     #4d4c48;
+  --c-olive:        #5e5d59;
+  --c-stone:        #87867f;
+  --c-warm-silver:  #b0aea5;
+
+  /* 强调 · 唯一彩色 */
+  --c-terracotta:       #c96442;
+  --c-terracotta-rgb:   201, 100, 66;
+  --c-coral:            #d97757;
+  --c-terracotta-soft:  rgba(201, 100, 66, 0.10);
+  --c-terracotta-glow:  rgba(201, 100, 66, 0.18);
+
+  /* 语义 */
+  --c-error:    #b53333;
+  --c-success:  #6f8e5f;
+  --c-warning:  #b8956e;
+  --c-focus:    #3898ec;        /* 唯一冷色 · 仅 input focus */
+
+  /* Ring shadow · Claude 标志性假边框 */
+  --ring-default: 0 0 0 1px var(--c-ring-warm);
+  --ring-deep:    0 0 0 1px var(--c-ring-deep);
+  --ring-brand:   0 0 0 1px var(--c-terracotta);
+  --shadow-whisper: rgba(0, 0, 0, 0.05) 0px 4px 24px;
+  --shadow-soft:    rgba(20, 20, 19, 0.04) 0px 1px 3px;
+
+  /* 缓动 */
+  --ease-cinema:    cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-out-expo:  cubic-bezier(0.19, 1, 0.22, 1);
+
+  /* 字体 */
+  --font-display:    'Fraunces', 'Times New Roman', Georgia, serif;
+  --font-body:       'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:       'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  --font-cn-display: 'Noto Serif SC', 'Songti SC', serif;
+  --font-cn-body:    'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* ============================================================
+   2. Body · Parchment 米色底 + 微妙暖光晕 + 科技网格点阵
+============================================================ */
+html, body, #app {
+  background: var(--c-parchment) !important;
+  color: var(--c-near-black) !important;
+}
+
+body {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(201, 100, 66, 0.04), transparent 42%),
+    radial-gradient(circle at 82% 100%, rgba(111, 142, 95, 0.03), transparent 50%),
+    var(--c-parchment) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+/* 网格点阵背景层 · 科技感来源 1(极轻,几乎不可见) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(20, 20, 19, 0.045) 1px, transparent 1.5px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+#app { position: relative; z-index: 1; }
+
+/* ============================================================
+   3. 顶栏 · 暖奶油毛玻璃 + Claude 风极简
+============================================================ */
+.topbar {
+  background: rgba(245, 244, 237, 0.78) !important;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--c-border) !important;
+}
+
+/* Brand · Claude 同款简洁 */
+.brand {
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 36px !important;
+  height: 36px !important;
+  background: var(--c-terracotta) !important;
+  color: var(--c-ivory) !important;
+  border-radius: 8px !important;          /* Claude comfortably rounded */
+  box-shadow:
+    var(--ring-brand),
+    var(--shadow-soft) !important;
+  position: relative;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 删除墨道朱砂签名光晕(太重) */
+.brand-mark::before,
+.brand-mark::after {
+  display: none !important;
+}
+
+/* 八角星 logo · Claude 同款 ✻ */
+.brand-mark .brand-mark-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* 老的「壹」字也保留兼容(如果 vue 里还在用) */
+.brand-mark .brand-mark-glyph {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--c-ivory);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.brand h1 {
+  font-family: var(--font-display), var(--font-cn-display) !important;
+  font-weight: 500 !important;
+  font-size: 18px !important;
+  color: var(--c-near-black) !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 !important;
+}
+
+.brand p {
+  color: var(--c-stone) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+  margin: 4px 0 0 0 !important;
+}
+
+/* 顶部导航 · Claude 风胶囊但更轻 */
+.topnav {
+  background: var(--c-warm-sand) !important;
+  border: 1px solid var(--c-border-warm) !important;
+  padding: 5px !important;
+  border-radius: 999px !important;
+  gap: 4px !important;
+  box-shadow: var(--shadow-soft);
+}
+
+.topnav-item {
+  background: transparent !important;
+  color: var(--c-olive) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 999px !important;
+  padding: 8px 16px !important;
+  min-width: auto !important;
+  transition: all 240ms var(--ease-cinema) !important;
+}
+
+.topnav-item:hover {
+  background: rgba(255, 255, 255, 0.6) !important;
+  color: var(--c-near-black) !important;
+}
+
+.topnav-item.active {
+  background: var(--c-near-black) !important;
+  color: var(--c-ivory) !important;
+  box-shadow: 0 4px 12px rgba(20, 20, 19, 0.16) !important;
+}
+
+/* Lang switch */
+.lang-switch {
+  background: var(--c-warm-sand) !important;
+  border: 1px solid var(--c-border-warm) !important;
+  border-radius: 999px !important;
+}
+
+.lang-button {
+  color: var(--c-olive) !important;
+  font-family: var(--font-mono) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.05em !important;
+  border-radius: 999px !important;
+}
+
+.lang-button.active {
+  background: var(--c-terracotta) !important;
+  color: var(--c-ivory) !important;
+}
+
+.lang-button:not(.active):hover {
+  color: var(--c-near-black) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+.topbar-status {
+  color: var(--c-stone) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+}
+
+.status-icon {
+  color: var(--c-success) !important;
+}
+
+/* ============================================================
+   4. Chips · Claude 风 muted 标签
+============================================================ */
+.chip {
+  background: var(--c-warm-sand) !important;
+  color: var(--c-olive) !important;
+  border: none !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  border-radius: 999px !important;
+  padding: 4px 12px !important;
+  box-shadow: var(--ring-default) !important;
+}
+
+.chip-dark {
+  background: var(--c-near-black) !important;
+  color: var(--c-ivory) !important;
+  box-shadow: none !important;
+}
+
+.chip-blue {
+  background: rgba(56, 152, 236, 0.10) !important;
+  color: var(--c-focus) !important;
+  box-shadow: 0 0 0 1px rgba(56, 152, 236, 0.25) !important;
+}
+
+.chip-violet {
+  background: var(--c-terracotta-soft) !important;
+  color: var(--c-terracotta) !important;
+  box-shadow: 0 0 0 1px rgba(201, 100, 66, 0.25) !important;
+}
+
+.chip-green {
+  background: rgba(111, 142, 95, 0.10) !important;
+  color: var(--c-success) !important;
+  box-shadow: 0 0 0 1px rgba(111, 142, 95, 0.25) !important;
+}
+
+/* ============================================================
+   5. Glass Panel → Claude 风 Ivory 卡
+============================================================ */
+.glass-panel {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 16px !important;
+}
+
+/* ============================================================
+   6. Hero Card · Claude editorial 大字
+============================================================ */
+.hero-card {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  box-shadow: var(--shadow-whisper) !important;
+  border-radius: 24px !important;        /* very rounded */
+  position: relative;
+  overflow: hidden;
+}
+
+/* 极简右上角点缀 · 不要墨道那种朱砂方块,改一个小八角星图标 */
+.hero-card::before {
+  content: '✻';
+  position: absolute;
+  top: 28px; right: 32px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--c-terracotta);
+  opacity: 0.55;
+  z-index: 2;
+  font-weight: 400;
+}
+
+.hero-card .chip {
+  background: var(--c-terracotta-soft) !important;
+  color: var(--c-terracotta) !important;
+  box-shadow: 0 0 0 1px rgba(201, 100, 66, 0.32) !important;
+}
+
+.hero-card h2 {
+  font-family: var(--font-display), var(--font-cn-display) !important;
+  font-size: clamp(44px, 6vw, 80px) !important;
+  font-weight: 500 !important;             /* Claude 单一 weight 500 */
+  line-height: 1.10 !important;
+  letter-spacing: -0.012em !important;
+  color: var(--c-near-black) !important;
+  margin: 0 0 24px 0 !important;
+}
+
+.hero-card p {
+  color: var(--c-olive) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  font-size: 19px !important;
+  line-height: 1.60 !important;
+  letter-spacing: 0 !important;
+  max-width: 60ch;
+  margin: 0;
+}
+
+.hero-orb {
+  background:
+    radial-gradient(circle, rgba(201, 100, 66, 0.20), transparent 60%) !important;
+  filter: blur(80px) !important;
+  opacity: 0.7 !important;
+}
+
+/* ============================================================
+   7. Stat Tile · Claude 风 ring shadow + tabular nums
+============================================================ */
+.stat-tile {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  box-shadow: none !important;
+  border-radius: 14px !important;
+  position: relative;
+  transition: all 320ms var(--ease-cinema) !important;
+  overflow: hidden;
+}
+
+.stat-tile:hover {
+  background: var(--c-white) !important;
+  box-shadow: var(--shadow-whisper), var(--ring-default) !important;
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  background: var(--c-terracotta-soft) !important;
+  color: var(--c-terracotta) !important;
+  border: none !important;
+  box-shadow: 0 0 0 1px rgba(201, 100, 66, 0.20) !important;
+  border-radius: 10px !important;
+}
+
+.stat-icon-blue {
+  background: rgba(56, 152, 236, 0.10) !important;
+  color: var(--c-focus) !important;
+  box-shadow: 0 0 0 1px rgba(56, 152, 236, 0.20) !important;
+}
+
+.stat-icon-violet {
+  background: var(--c-terracotta-soft) !important;
+  color: var(--c-terracotta) !important;
+  box-shadow: 0 0 0 1px rgba(201, 100, 66, 0.20) !important;
+}
+
+.stat-icon-green {
+  background: rgba(111, 142, 95, 0.10) !important;
+  color: var(--c-success) !important;
+  box-shadow: 0 0 0 1px rgba(111, 142, 95, 0.20) !important;
+}
+
+.stat-label {
+  color: var(--c-stone) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.10em !important;
+  text-transform: uppercase !important;
+}
+
+.stat-value {
+  color: var(--c-near-black) !important;
+  font-family: var(--font-display) !important;
+  font-size: 36px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  font-feature-settings: "lnum", "tnum" !important;   /* tabular nums · 科技感 */
+}
+
+.stat-chevron {
+  color: var(--c-stone) !important;
+  transition: transform 280ms var(--ease-cinema), color 280ms;
+}
+
+.stat-tile:hover .stat-chevron {
+  color: var(--c-terracotta) !important;
+  transform: translateX(4px);
+}
+
+/* ============================================================
+   8. Section Card · Claude 暖卡片
+============================================================ */
+.section-card {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  box-shadow: none !important;
+  border-radius: 16px !important;
+}
+
+.section-card h3 {
+  font-family: var(--font-display), var(--font-cn-display) !important;
+  color: var(--c-near-black) !important;
+  font-size: 28px !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em !important;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-card p {
+  color: var(--c-olive);
+  font-family: var(--font-body), var(--font-cn-body);
+  line-height: 1.6;
+}
+
+.section-header {
+  border-bottom: 1px solid var(--c-border) !important;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+}
+
+.text-button {
+  color: var(--c-terracotta) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  background: transparent !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0 !important;
+  position: relative;
+}
+
+.text-button:hover {
+  color: var(--c-coral) !important;
+  transform: translateX(2px);
+  transition: transform 200ms var(--ease-cinema);
+}
+
+/* ============================================================
+   9. Step Card · 三步流程 · Claude editorial
+============================================================ */
+.step-card {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 14px !important;
+  padding: 32px 28px !important;
+  transition: all 320ms var(--ease-cinema) !important;
+  position: relative;
+  text-align: left !important;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.step-card:hover {
+  background: var(--c-white) !important;
+  box-shadow: var(--shadow-whisper), var(--ring-default) !important;
+  transform: translateY(-4px);
+}
+
+.step-line {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  margin-bottom: 20px !important;
+}
+
+.step-index {
+  font-family: var(--font-display) !important;
+  font-size: 56px !important;
+  font-weight: 500 !important;
+  font-style: italic !important;
+  line-height: 1 !important;
+  color: var(--c-stone) !important;
+  letter-spacing: -0.02em !important;
+  transition: color 320ms var(--ease-cinema);
+  font-feature-settings: "lnum", "tnum";
+}
+
+.step-card:hover .step-index {
+  color: var(--c-terracotta) !important;
+}
+
+.step-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--c-border-warm);
+}
+
+.step-card h4 {
+  font-family: var(--font-display), var(--font-cn-display) !important;
+  color: var(--c-near-black) !important;
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  margin: 0 0 12px 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.005em;
+}
+
+.step-card p {
+  color: var(--c-olive) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  margin: 0;
+}
+
+.step-arrow {
+  color: var(--c-stone) !important;
+  transition: transform 280ms var(--ease-cinema), color 280ms !important;
+}
+
+.step-card:hover .step-arrow {
+  color: var(--c-terracotta) !important;
+  transform: translateX(4px);
+}
+
+/* ============================================================
+   10. Workflow Highlight
+============================================================ */
+.workflow-highlight {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 14px !important;
+  padding: 28px !important;
+  position: relative;
+}
+
+.workflow-title {
+  font-family: var(--font-display), var(--font-cn-display) !important;
+  color: var(--c-near-black) !important;
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  margin-bottom: 8px !important;
+}
+
+.workflow-id {
+  color: var(--c-stone) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.05em;
+}
+
+.workflow-badges {
+  margin-top: 14px !important;
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px !important;
+}
+
+.workflow-mark {
+  background: var(--c-terracotta-soft) !important;
+  color: var(--c-terracotta) !important;
+  box-shadow: 0 0 0 1px rgba(201, 100, 66, 0.25) !important;
+  border: none !important;
+  border-radius: 10px !important;
+}
+
+/* ============================================================
+   11. Buttons · Claude 同款 ring shadow
+============================================================ */
+/* Brand Terracotta(Primary CTA) */
+.accent-button,
+.accent-button-blue,
+.accent-button-violet {
+  background: var(--c-terracotta) !important;
+  color: var(--c-ivory) !important;
+  border: none !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  font-weight: 500 !important;
+  border-radius: 12px !important;          /* Claude generously rounded */
+  padding: 10px 20px !important;
+  box-shadow: var(--ring-brand) !important;
+  transition: all 240ms var(--ease-cinema) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.accent-button:hover {
+  background: var(--c-coral) !important;
+  box-shadow:
+    var(--ring-brand),
+    var(--shadow-whisper) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Warm Sand (Secondary) */
+.ghost-button {
+  background: var(--c-warm-sand) !important;
+  border: none !important;
+  color: var(--c-charcoal) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  box-shadow: var(--ring-default) !important;
+  transition: all 240ms var(--ease-cinema) !important;
+}
+
+.ghost-button:hover {
+  background: var(--c-white) !important;
+  box-shadow: var(--ring-deep), var(--shadow-soft) !important;
+  color: var(--c-near-black) !important;
+}
+
+/* Add Card 虚线 */
+.add-card,
+.add-card-blue,
+.add-card-violet,
+.manager-add-card {
+  background: var(--c-ivory) !important;
+  border: 1.5px dashed var(--c-border-warm) !important;
+  color: var(--c-olive) !important;
+  border-radius: 14px !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  transition: all 240ms var(--ease-cinema) !important;
+}
+
+.add-card:hover,
+.add-card-blue:hover,
+.add-card-violet:hover,
+.manager-add-card:hover {
+  background: var(--c-white) !important;
+  border-color: var(--c-terracotta) !important;
+  border-style: solid !important;
+  color: var(--c-terracotta) !important;
+}
+
+/* Icon button */
+.icon-button,
+.icon-button-chat,
+.icon-button-store,
+.chat-panel-button {
+  background: var(--c-ivory) !important;
+  border: none !important;
+  color: var(--c-olive) !important;
+  border-radius: 10px !important;
+  box-shadow: var(--ring-default) !important;
+  transition: all 200ms var(--ease-cinema) !important;
+}
+
+.icon-button:hover,
+.icon-button-chat:hover,
+.icon-button-store:hover,
+.chat-panel-button:hover {
+  background: var(--c-white) !important;
+  box-shadow: var(--ring-deep) !important;
+  color: var(--c-near-black) !important;
+}
+
+/* ============================================================
+   12. Inputs / Textarea · Focus Blue · 唯一冷色
+============================================================ */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background: var(--c-white) !important;
+  border: 1px solid var(--c-border-warm) !important;
+  color: var(--c-near-black) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  border-radius: 10px !important;
+  transition: border-color 200ms, box-shadow 200ms !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: var(--c-focus) !important;
+  box-shadow: 0 0 0 3px rgba(56, 152, 236, 0.16) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--c-stone) !important;
+}
+
+/* ============================================================
+   13. Markdown body · 文章正文
+============================================================ */
+.markdown-body {
+  color: var(--c-olive) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  line-height: 1.7 !important;
+  font-size: 15px;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+  color: var(--c-near-black) !important;
+  font-family: var(--font-display), var(--font-cn-display) !important;
+  font-weight: 500 !important;
+}
+
+.markdown-body code {
+  background: var(--c-warm-sand) !important;
+  color: var(--c-terracotta) !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.9em !important;
+}
+
+.markdown-body pre {
+  background: var(--c-near-black) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  color: var(--c-warm-silver) !important;
+}
+
+.markdown-body pre code {
+  background: transparent !important;
+  color: var(--c-warm-silver) !important;
+  padding: 0 !important;
+}
+
+.markdown-body a {
+  color: var(--c-terracotta) !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(201, 100, 66, 0.32);
+  transition: border-color 200ms;
+}
+
+.markdown-body a:hover {
+  border-color: var(--c-terracotta);
+}
+
+.markdown-body blockquote {
+  border-left: 2px solid var(--c-terracotta) !important;
+  padding-left: 16px !important;
+  color: var(--c-olive) !important;
+  font-family: var(--font-display), var(--font-cn-display) !important;
+  font-style: italic;
+}
+
+/* ============================================================
+   14. Workflow Graph · 浅色版
+============================================================ */
+.graph-shell {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 16px;
+}
+
+.graph-canvas-wrap {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(20, 20, 19, 0.025), transparent 70%),
+    var(--c-parchment) !important;
+  background-image:
+    radial-gradient(circle, rgba(20, 20, 19, 0.06) 1px, transparent 1px) !important;
+  background-size: 24px 24px !important;
+}
+
+.graph-svg-base path,
+.graph-svg-base line {
+  stroke: var(--c-stone) !important;
+  opacity: 0.45;
+}
+
+.graph-svg-overlay path {
+  stroke: var(--c-terracotta) !important;
+  filter: drop-shadow(0 0 6px var(--c-terracotta-glow));
+}
+
+.graph-node {
+  fill: var(--c-ivory) !important;
+  stroke: var(--c-border-warm) !important;
+}
+
+.graph-node-ring {
+  stroke: var(--c-terracotta) !important;
+  filter: drop-shadow(0 0 8px var(--c-terracotta-glow));
+}
+
+.graph-terminal {
+  fill: var(--c-near-black) !important;
+}
+
+.graph-id {
+  color: var(--c-stone) !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* ============================================================
+   15. Trace Events
+============================================================ */
+.trace-flow-status-success { color: var(--c-success) !important; }
+.trace-flow-status-error { color: var(--c-error) !important; }
+.trace-flow-status-info { color: var(--c-focus) !important; }
+.trace-flow-status-warning { color: var(--c-warning) !important; }
+
+/* ============================================================
+   16. Chat · 暖米白对话
+============================================================ */
+.chat-shell {
+  background: var(--c-parchment) !important;
+}
+
+.chat-bubble {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-near-black) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  line-height: 1.7 !important;
+  border-radius: 16px !important;
+}
+
+.chat-row[data-role="user"] .chat-bubble {
+  background: var(--c-terracotta) !important;
+  color: var(--c-ivory) !important;
+  border-color: var(--c-terracotta) !important;
+}
+
+.chat-input-shell, .chat-input-wrap {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border-warm) !important;
+  border-radius: 14px !important;
+}
+
+.chat-agent-name {
+  color: var(--c-terracotta) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+}
+
+.chat-empty-state {
+  color: var(--c-stone) !important;
+  font-family: var(--font-display), var(--font-cn-display) !important;
+}
+
+/* ============================================================
+   17. Agent / Workflow Manager
+============================================================ */
+.agent-card,
+.agent-card-shell,
+.manager-agent-card {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border) !important;
+  border-radius: 14px !important;
+  transition: all 240ms var(--ease-cinema) !important;
+}
+
+.agent-card:hover,
+.agent-card-shell:hover,
+.manager-agent-card:hover {
+  background: var(--c-white) !important;
+  box-shadow: var(--shadow-whisper), var(--ring-default) !important;
+  transform: translateY(-2px);
+}
+
+.agent-avatar,
+.agent-avatar-hero {
+  background: var(--c-terracotta-soft) !important;
+  color: var(--c-terracotta) !important;
+  box-shadow: 0 0 0 1px rgba(201, 100, 66, 0.20) !important;
+  border-radius: 10px !important;
+  border: none !important;
+}
+
+.agent-role-pill,
+.capability-pill {
+  background: var(--c-warm-sand) !important;
+  color: var(--c-olive) !important;
+  border: none !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.06em !important;
+  border-radius: 999px !important;
+  padding: 3px 10px;
+}
+
+.agent-prompt-preview {
+  background: var(--c-parchment) !important;
+  border: 1px solid var(--c-border) !important;
+  color: var(--c-olive) !important;
+  font-family: var(--font-body), var(--font-cn-body) !important;
+  border-radius: 10px;
+}
+
+.agent-modal-overlay {
+  background: rgba(20, 20, 19, 0.36) !important;
+  backdrop-filter: blur(8px);
+}
+
+.agent-modal-panel {
+  background: var(--c-ivory) !important;
+  border: 1px solid var(--c-border-warm) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow-whisper) !important;
+}
+
+.agent-modal-header {
+  border-bottom: 1px solid var(--c-border) !important;
+}
+
+.agent-modal-footer {
+  border-top: 1px solid var(--c-border) !important;
+}
+
+.field-label {
+  color: var(--c-olive) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.10em !important;
+  text-transform: uppercase !important;
+}
+
+/* ============================================================
+   18. 新组件 · SpotlightCard / Eyebrow / H2
+============================================================ */
+.spotlight-card {
+  background: var(--c-ivory);
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  --mx: 50%;
+  --my: 50%;
+  transition: all 240ms var(--ease-cinema);
+}
+
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mx) var(--my),
+    var(--c-terracotta-soft) 0%,
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 400ms var(--ease-cinema);
+  pointer-events: none;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+.spotlight-card:hover {
+  box-shadow: var(--shadow-whisper);
+}
+
+/* Mono Eyebrow · 科技感工艺 */
+.ink-eyebrow,
+.mono-eyebrow {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-terracotta);
+  margin-bottom: 16px;
+}
+
+.ink-eyebrow::before,
+.mono-eyebrow::before {
+  content: '— ';
+  opacity: 0.6;
+}
+
+/* Section H2 · Claude editorial 衬线 */
+.ink-h2,
+.serif-h2 {
+  font-family: var(--font-display), var(--font-cn-display);
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 500;
+  line-height: 1.20;
+  letter-spacing: -0.012em;
+  margin-bottom: 24px;
+  color: var(--c-near-black);
+}
+
+/* Aurora · 改为非常微妙的暖光晕(避免太多动) */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.aurora-bg::before,
+.aurora-bg::after {
+  content: '';
+  position: absolute;
+  width: 1000px;
+  height: 700px;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.10;
+  animation: claudeDrift 50s ease-in-out infinite alternate;
+}
+
+.aurora-bg::before {
+  background: radial-gradient(circle, var(--c-terracotta), transparent 60%);
+  top: -20%;
+  left: -10%;
+}
+
+.aurora-bg::after {
+  background: radial-gradient(circle, var(--c-success), transparent 60%);
+  bottom: -20%;
+  right: -10%;
+  animation-direction: alternate-reverse;
+  animation-duration: 60s;
+}
+
+@keyframes claudeDrift {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(60px, 40px); }
+}
+
+/* ============================================================
+   19. Tier Badge
+============================================================ */
+.tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  border: none;
+}
+
+.tier-badge-lightning {
+  background: var(--c-terracotta-soft);
+  color: var(--c-terracotta);
+  box-shadow: 0 0 0 1px rgba(201, 100, 66, 0.32);
+}
+
+.tier-badge-standard {
+  background: rgba(56, 152, 236, 0.10);
+  color: var(--c-focus);
+  box-shadow: 0 0 0 1px rgba(56, 152, 236, 0.32);
+}
+
+.tier-badge-premium {
+  background: rgba(184, 149, 110, 0.12);
+  color: var(--c-warning);
+  box-shadow: 0 0 0 1px rgba(184, 149, 110, 0.32);
+}
+
+/* ============================================================
+   20. Scrollbar / Selection
+============================================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-border-warm);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-stone);
+}
+
+::selection {
+  background: var(--c-terracotta);
+  color: var(--c-ivory);
+}
+
+/* ============================================================
+   21. Reduced Motion · 降级
+============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .aurora-bg::before,
+  .aurora-bg::after {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   22. 响应式
+============================================================ */
+@media (max-width: 640px) {
+  body::before { opacity: 0.3; }
+  .aurora-bg { display: none; }
+  .hero-card h2 { font-size: clamp(32px, 9vw, 48px) !important; }
+  .stat-value { font-size: 28px !important; }
+  .step-index { font-size: 44px !important; }
+}
+
+/* ============================================================
+   尾巴 · 主题标记
+============================================================ */
+:root {
+  --theme: 'claude-light';
+  --theme-version: '2.0';
+}
