@@ -34,19 +34,45 @@ def _new_id(prefix: str) -> str:
 class SQLitePlaygroundStore:
     def __init__(self, db_path: Path | None = None) -> None:
         import os as _os
+        import sqlite3 as _sqlite3
+        import sys as _sys
         app_home = Path(settings.APP_HOME).resolve()
         bundled_skills_root = Path(settings.BUNDLED_SKILLS_ROOT).resolve()
         self.app_home = app_home
-        # 优先读 DB_PATH 环境变量(云端 Volume 挂载场景),否则走 app_home 默认
-        if db_path is None:
-            env_db = _os.environ.get("DB_PATH", "").strip()
-            if env_db:
-                db_path = Path(env_db)
-        self.db_path = db_path or (app_home / "data" / "agent_playground.db")
+
+        # 解析 db_path · 保证可写
+        # 1. 显式传入  2. DB_PATH env  3. app_home 默认  4. /tmp fallback
+        candidates: list[Path] = []
+        if db_path is not None:
+            candidates.append(Path(db_path))
+        env_db = _os.environ.get("DB_PATH", "").strip()
+        if env_db:
+            candidates.append(Path(env_db))
+        candidates.append(app_home / "data" / "agent_playground.db")
+        candidates.append(Path("/tmp/agent_playground.db"))
+
+        chosen: Path | None = None
+        for cand in candidates:
+            try:
+                cand.parent.mkdir(parents=True, exist_ok=True)
+                with _sqlite3.connect(str(cand)) as _c:
+                    _c.execute("SELECT 1")
+                chosen = cand
+                break
+            except Exception as exc:
+                print(f"[store] db_path candidate {cand} unusable: {exc}", file=_sys.stderr, flush=True)
+        if chosen is None:
+            # 兜底:让最后一个报真实错误
+            chosen = candidates[-1]
+        self.db_path = chosen
+
         self.skills_root = app_home / "skills"
         self.bundled_skills_root = bundled_skills_root
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self.skills_root.mkdir(parents=True, exist_ok=True)
+        # skills_root 写不进就只读模式 · 不阻断启动
+        try:
+            self.skills_root.mkdir(parents=True, exist_ok=True)
+        except Exception as exc:
+            print(f"[store] skills_root {self.skills_root} mkdir failed: {exc}", file=_sys.stderr, flush=True)
         self._init_db()
 
     def _iter_skill_roots(self) -> list[Path]:

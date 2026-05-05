@@ -658,18 +658,42 @@ class HarnessStore:
 _default_store: HarnessStore | None = None
 
 
+def _resolve_writable_db_path(default_path: Path) -> Path:
+    """
+    选 DB 路径并保证可写:
+    1. 优先 DB_PATH 环境变量
+    2. fallback 到给定 default_path
+    3. 仍不可写时再降级到 /tmp/agent_playground.db(任何云容器都能写)
+    """
+    import os as _os
+    import sys as _sys
+
+    env_db = _os.environ.get("DB_PATH", "").strip()
+    candidates = []
+    if env_db:
+        candidates.append(Path(env_db))
+    candidates.append(default_path)
+    candidates.append(Path("/tmp/agent_playground.db"))
+
+    for cand in candidates:
+        try:
+            cand.parent.mkdir(parents=True, exist_ok=True)
+            # touch 一下试试可写
+            with sqlite3.connect(str(cand)) as _c:
+                _c.execute("SELECT 1")
+            return cand
+        except Exception as exc:
+            print(f"[harness] db_path candidate {cand} unusable: {exc}", file=_sys.stderr, flush=True)
+            continue
+    # 极端情况 · 全部失败,返回最后一个让上层报错
+    return candidates[-1]
+
+
 def get_harness_store(db_path: str | Path | None = None) -> HarnessStore:
     global _default_store
     if _default_store is None:
         if db_path is None:
-            # 优先读 DB_PATH 环境变量(云端 Volume 挂载场景),fallback 本地默认
-            import os as _os
-            env_db = _os.environ.get("DB_PATH", "").strip()
-            if env_db:
-                db_path = Path(env_db)
-            else:
-                # 默认路径 · 跟主 store 同一个 DB
-                db_path = Path(__file__).resolve().parents[2] / "data" / "agent_playground.db"
-            db_path.parent.mkdir(parents=True, exist_ok=True)
+            default_path = Path(__file__).resolve().parents[2] / "data" / "agent_playground.db"
+            db_path = _resolve_writable_db_path(default_path)
         _default_store = HarnessStore(db_path)
     return _default_store
