@@ -33,9 +33,15 @@ def _new_id(prefix: str) -> str:
 
 class SQLitePlaygroundStore:
     def __init__(self, db_path: Path | None = None) -> None:
+        import os as _os
         app_home = Path(settings.APP_HOME).resolve()
         bundled_skills_root = Path(settings.BUNDLED_SKILLS_ROOT).resolve()
         self.app_home = app_home
+        # 优先读 DB_PATH 环境变量(云端 Volume 挂载场景),否则走 app_home 默认
+        if db_path is None:
+            env_db = _os.environ.get("DB_PATH", "").strip()
+            if env_db:
+                db_path = Path(env_db)
         self.db_path = db_path or (app_home / "data" / "agent_playground.db")
         self.skills_root = app_home / "skills"
         self.bundled_skills_root = bundled_skills_root

@@ -662,7 +662,14 @@ def get_harness_store(db_path: str | Path | None = None) -> HarnessStore:
     global _default_store
     if _default_store is None:
         if db_path is None:
-            # 默认路径 · 跟主 store 同一个 DB
-            db_path = Path(__file__).resolve().parents[2] / "data" / "agent_playground.db"
+            # 优先读 DB_PATH 环境变量(云端 Volume 挂载场景),fallback 本地默认
+            import os as _os
+            env_db = _os.environ.get("DB_PATH", "").strip()
+            if env_db:
+                db_path = Path(env_db)
+            else:
+                # 默认路径 · 跟主 store 同一个 DB
+                db_path = Path(__file__).resolve().parents[2] / "data" / "agent_playground.db"
+            db_path.parent.mkdir(parents=True, exist_ok=True)
         _default_store = HarnessStore(db_path)
     return _default_store

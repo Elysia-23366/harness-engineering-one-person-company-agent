@@ -1,0 +1,19 @@
+# Railway / Nixpacks 部署配置
+# 入口:Procfile 的 web 进程
+# Python 3.12 是 nixpacks 当前稳定支持的最新版,本地 3.14 仅做兼容性验证
+
+[phases.setup]
+nixPkgs = ["python312", "gcc"]
+
+[phases.install]
+cmds = [
+  "python -m venv /opt/venv",
+  ". /opt/venv/bin/activate && pip install --upgrade pip",
+  ". /opt/venv/bin/activate && pip install -r requirements.txt"
+]
+
+[start]
+cmd = ". /opt/venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+
+[variables]
+PYTHON_VERSION = "3.12"

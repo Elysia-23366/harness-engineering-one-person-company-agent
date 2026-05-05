@@ -1,0 +1,2 @@
+# 占位文件 · 让 backend/data/ 目录在云端 git clone 后存在
+# (实际 .db 被 .gitignore 排除,目录无文件会消失,sqlite3 写入会失败)
