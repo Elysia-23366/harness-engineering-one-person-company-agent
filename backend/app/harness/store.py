@@ -129,11 +129,34 @@ def _emotion_match_score(current: str, event: str) -> float:
 # ============================================================
 # Harness Store
 # ============================================================
+def _ensure_harness_schema(db_path: str) -> None:
+    """
+    启动时执行一次 · 保证 Harness 6 张表存在(idempotent · IF NOT EXISTS)
+    schema 来源:backend/scripts/harness_migration.sql
+    云端首次部署没人手动跑过 migration,这里兜底建表
+    """
+    sql_path = Path(__file__).resolve().parents[2] / "scripts" / "harness_migration.sql"
+    if not sql_path.exists():
+        # 找不到也不阻断启动 · 让后续 query 自己报错
+        import sys as _sys
+        print(f"[harness] migration sql missing: {sql_path}", file=_sys.stderr, flush=True)
+        return
+    sql = sql_path.read_text(encoding="utf-8")
+    with sqlite3.connect(db_path) as conn:
+        conn.executescript(sql)
+
+
 class HarnessStore:
     """三库 CRUD + 衰减/召回算法 · 独立于主 store。"""
 
     def __init__(self, db_path: str | Path):
         self.db_path = str(db_path)
+        # 兜底建表 · 云端首次启动一定跑一次,本地已存在表也是 no-op
+        try:
+            _ensure_harness_schema(self.db_path)
+        except Exception as exc:
+            import sys as _sys
+            print(f"[harness] ensure_schema failed (continuing): {exc}", file=_sys.stderr, flush=True)
 
     def _conn(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
