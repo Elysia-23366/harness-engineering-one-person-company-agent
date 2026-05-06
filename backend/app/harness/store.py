@@ -1,7 +1,6 @@
 """
 Harness Store · 三库 CRUD + 衰减算法 + 召回算法
 
-核心算法(灵感自武艺分享):
   - 衰减计算:decayed_importance = score * exp(-decay_rate * days_since)
   - 召回评分:final_score = 0.4 * decayed/9 + 0.4 * keyword_match + 0.2 * emotion_match
   - 阈值淘汰:final_score < 2.0 标记 is_active=0(可恢复)
@@ -41,13 +40,11 @@ from .schemas import (
     utc_now_iso,
 )
 
-
 # ============================================================
 # 工具函数
 # ============================================================
 def _new_id(prefix: str) -> str:
     return f"{prefix}_{uuid.uuid4().hex[:10]}"
-
 
 def _parse_iso(s: str) -> datetime:
     """ISO 8601 → datetime · 兼容 'Z' 后缀。"""
@@ -57,30 +54,25 @@ def _parse_iso(s: str) -> datetime:
     except Exception:
         return datetime.now(timezone.utc)
 
-
 def _days_since(iso_str: str) -> float:
     """到现在多少天(可能是小数)。"""
     delta = datetime.now(timezone.utc) - _parse_iso(iso_str)
     return max(0.0, delta.total_seconds() / 86400.0)
 
-
 def _decayed_importance(score: float, decay_rate: float, days_since: float) -> float:
-    """衰减公式 · 武艺原版:e^(-decay_rate * days)。"""
+    """衰减公式 · 原版:e^(-decay_rate * days)。"""
     return score * math.exp(-decay_rate * days_since)
-
 
 # ============================================================
 # 关键词 + 情绪匹配算法(MVP · 简单实现)
 # ============================================================
 _TOKEN_RE = re.compile(r"[一-鿿]|[a-zA-Z0-9]+", re.UNICODE)
 
-
 def _tokenize(text: str) -> set[str]:
     """中文按字 + 英文按词,简易版分词。"""
     if not text:
         return set()
     return set(t.lower() for t in _TOKEN_RE.findall(text))
-
 
 def _keyword_match_score(query: str, content: str) -> float:
     """
@@ -94,7 +86,6 @@ def _keyword_match_score(query: str, content: str) -> float:
     overlap = q_tokens & c_tokens
     # 偏向 query 命中(分母用 query 长度,而不是并集)
     return len(overlap) / max(1, len(q_tokens))
-
 
 _EMOTION_DISTANCE = {
     ("neutral", "neutral"): 1.0,
@@ -114,7 +105,6 @@ _EMOTION_DISTANCE = {
     ("neutral", "breakthrough"): 0.5,
 }
 
-
 def _emotion_match_score(current: str, event: str) -> float:
     """情绪匹配 · 0-1。"""
     key = (current, event)
@@ -124,7 +114,6 @@ def _emotion_match_score(current: str, event: str) -> float:
     if rev in _EMOTION_DISTANCE:
         return _EMOTION_DISTANCE[rev]
     return 0.3  # 跨情绪默认低分
-
 
 # ============================================================
 # Harness Store
@@ -144,7 +133,6 @@ def _ensure_harness_schema(db_path: str) -> None:
     sql = sql_path.read_text(encoding="utf-8")
     with sqlite3.connect(db_path) as conn:
         conn.executescript(sql)
-
 
 class HarnessStore:
     """三库 CRUD + 衰减/召回算法 · 独立于主 store。"""
@@ -265,7 +253,6 @@ class HarnessStore:
         limit: int = 5,
     ) -> list[EventMemoryRecallScore]:
         """
-        召回 top-K 最相关事件 · 武艺分享同款 5 条精准 > 全量塞。
 
         最终评分 = 0.4 * decayed/9 + 0.4 * keyword_match + 0.2 * emotion_match
         """
@@ -674,12 +661,10 @@ class HarnessStore:
             last_updated=row["last_updated"],
         )
 
-
 # ============================================================
 # 单例(给 routes / engine / workflow hook 用)
 # ============================================================
 _default_store: HarnessStore | None = None
-
 
 def _resolve_writable_db_path(default_path: Path) -> Path:
     """
@@ -710,7 +695,6 @@ def _resolve_writable_db_path(default_path: Path) -> Path:
             continue
     # 极端情况 · 全部失败,返回最后一个让上层报错
     return candidates[-1]
-
 
 def get_harness_store(db_path: str | Path | None = None) -> HarnessStore:
     global _default_store

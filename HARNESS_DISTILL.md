@@ -1,6 +1,6 @@
-# Harness Distillation Card · 武艺《Harness Engineering》工程化总结
+# Harness Distillation Card · 工程化总结
 
-> **一句话源起**:武艺 2026-04-28 闭门分享提出 `Agent = Model + Harness`,我把这套机制拆成 7 个工程模块,全部嵌入「一人公司 Agent」。
+> **一句话源起**: `Agent = Model + Harness`,我把这套机制拆成 7 个工程模块,全部嵌入「一人公司 Agent」。
 >
 > **本卡定位**:一页讲清是什么、做了什么、可以从哪里看到效果。
 
@@ -130,7 +130,7 @@ backend/test_harness_e2e.py · 8 段 e2e smoke,跑一次 27 秒,全绿
 
 ## 7. 这套东西"值"在哪
 
-- **一句话**:把武艺的"机制描述"翻译成"可点的按钮 + 可读的数字 + 可演的 demo"。
+- **一句话**:把"Harness 机制"翻译成"可点的按钮 + 可读的数字 + 可演的 demo"。
 - 业务上:**OOC 角色漂移**这个长期心病 → 三库 + 漂移雷达 → 真正可观测、可矫正。
 - 工程上:**Agent ≠ 一次性 prompt**,而是有记忆 / 会被检测 / 会自进化的常驻系统 → 这套代码就是那个系统。
 - 路演上:本卡 + EvolutionChart 单独一张图就够讲 5 分钟,数据自己会说话。
@@ -138,5 +138,4 @@ backend/test_harness_e2e.py · 8 段 e2e smoke,跑一次 27 秒,全绿
 ---
 
 > 蒸馏作者: 一人公司 Agent · 完成于 2026-05-05
-> 灵感源: 武艺《Harness Engineering 闭门分享 · 2026-04-28》
 > 工程实现周期: W1 D3 → W2 D14,共 12 个工作日

@@ -178,7 +178,7 @@ onMounted(loadAll);
           <h2 class="mb-title">Memory · 三库记忆架构</h2>
         </div>
         <p class="mb-subtitle">
-          武艺角色漂移 OOC 工程解 · 事件库(衰减) ⊕ 角色认知(永久) ⊕ 关系节点(永久 · 每对独立)
+          角色漂移 OOC 工程解 · 事件库(衰减) ⊕ 角色认知(永久) ⊕ 关系节点(永久 · 每对独立)
         </p>
       </div>
       <div class="mb-meta">

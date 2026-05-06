@@ -32,7 +32,6 @@
 - **名称**:一人公司 Agent
 - **基于**:Multi-Agent-Playground(原项目 GitHub `Jasper-zh/Multi-Agent-Playground`,本地 fork 在 `C:\Users\FU\Desktop\Multi-Agent-Playground-main\`)
 - **核心叙事**:你 1 个 + 17 个 AI 岗位 = 一家会运转的公司
-- **灵感源**:武艺《Harness Engineering 闭门分享 · 2026-04-28》(原文在 `C:\Users\FU\Desktop\项目_碧蓝指挥官记忆系统POC\原始素材\武艺闭门分享_文字稿.txt`)
 - **公式**:`Agent = Model + Harness`
 
 ---
@@ -205,7 +204,7 @@ model:       mimo-v2.5-pro       (注意全小写,大写会 400)
 
 ---
 
-## 7. 武艺 Harness 核心 4 大机制(产品 DNA)
+## 7. Harness 核心 4 大机制(产品 DNA)
 
 ### 7.1 三层进化范式
 - 23 年 = Prompt Engineering / 24-25 年 = Context Engineering / **26 年 = Harness Engineering**

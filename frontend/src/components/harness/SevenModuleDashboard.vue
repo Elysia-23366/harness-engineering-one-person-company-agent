@@ -2,7 +2,7 @@
 /**
  * SevenModuleDashboard · Harness 七模块仪表盘 hero(W2 D12)
  *
- * 武艺《Harness Engineering》七模块:
+ * 七模块:
  *   1. 模型评判 model_evaluation
  *   2. 工具调用 tool_invocation
  *   3. 记忆管理 memory_management
@@ -95,7 +95,7 @@ onMounted(load);
           Agent = Model + <span class="sm-accent">Harness</span>
         </h1>
         <p class="sm-sub">
-          武艺《Harness Engineering 闭门分享 · 2026-04-28》核心机制全部工程化嵌入,
+          核心机制全部工程化嵌入,
           每个模块都有真实数据驱动 · 跑过的 workflow 越多,数据越厚。
         </p>
       </div>

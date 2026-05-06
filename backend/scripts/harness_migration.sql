@@ -1,7 +1,6 @@
 -- =================================================================
 -- Harness Engineering · DB Migration v1.0
 -- =================================================================
--- 灵感:武艺《Harness Engineering 闭门分享 · 2026-04-28》
 -- 三库记忆架构 + Sensors 自进化日志 + Guides 规则表
 --
 -- 执行方式:
@@ -15,9 +14,8 @@
 --   DROP TABLE guide_rule;
 -- =================================================================
 
-
 -- ----- 库 1 · 事件库(Episodic) · 衰减式 -------------------------
--- 武艺原话:"事件库存发生了什么,有情绪标签,会随聊得久而衰减,
+-- "事件库存发生了什么,有情绪标签,会随聊得久而衰减,
 --          但峰值点会留下来"
 CREATE TABLE IF NOT EXISTS event_memory (
   id TEXT PRIMARY KEY,
@@ -27,7 +25,7 @@ CREATE TABLE IF NOT EXISTS event_memory (
   user_id TEXT NOT NULL DEFAULT 'ceo',   -- 谁的事件(默认 CEO)
   content TEXT NOT NULL,                 -- 事件内容(摘要,不超过 500 字)
   emotion_tag TEXT NOT NULL DEFAULT 'neutral',  -- neutral|positive|negative|urgent|breakthrough
-  importance_score REAL NOT NULL DEFAULT 5.0,   -- 0-9 重要性评分(武艺原版)
+  importance_score REAL NOT NULL DEFAULT 5.0,   -- 0-9 重要性评分(原版)
   importance_emotion REAL DEFAULT 0,            -- 维度1:情绪激烈度 0-3
   importance_novelty REAL DEFAULT 0,            -- 维度2:是否带来新素材 0-3
   importance_relation REAL DEFAULT 0,           -- 维度3:是否影响关系 0-3
@@ -44,9 +42,8 @@ CREATE INDEX IF NOT EXISTS idx_event_memory_workflow ON event_memory(workflow_id
 CREATE INDEX IF NOT EXISTS idx_event_memory_score ON event_memory(importance_score DESC);
 CREATE INDEX IF NOT EXISTS idx_event_memory_active ON event_memory(is_active) WHERE is_active = 1;
 
-
 -- ----- 库 2 · 角色认知库(Persona Perception) · 永久 ----------------
--- 武艺原话:"角色对用户形成怎样的理解,这是不会衰减的,像你对好朋友的理解"
+-- "角色对用户形成怎样的理解,这是不会衰减的,像你对好朋友的理解"
 -- 17 个 agent × 1 个 CEO = 最多 17 行(每个 agent 1 条认知卡)
 CREATE TABLE IF NOT EXISTS persona_perception (
   id TEXT PRIMARY KEY,
@@ -64,9 +61,8 @@ CREATE TABLE IF NOT EXISTS persona_perception (
 
 CREATE INDEX IF NOT EXISTS idx_persona_perception_agent ON persona_perception(agent_id);
 
-
 -- ----- 库 3 · 关系节点库(Relationship) · 永久 + 每对独立 ------------
--- 武艺原话:"每个用户的决策观点是独立的,17 岗位对每个用户都是独立的关系坐标"
+-- "每个用户的决策观点是独立的,17 岗位对每个用户都是独立的关系坐标"
 CREATE TABLE IF NOT EXISTS relationship_node (
   id TEXT PRIMARY KEY,
   agent_id TEXT NOT NULL,
@@ -84,9 +80,8 @@ CREATE TABLE IF NOT EXISTS relationship_node (
 
 CREATE INDEX IF NOT EXISTS idx_relationship_node_agent ON relationship_node(agent_id);
 
-
 -- ----- Sensors 自进化日志 -----------------------------------------
--- 武艺原话:"命中率下降意味着系统出问题,会触发自动调整评估规则"
+-- "命中率下降意味着系统出问题,会触发自动调整评估规则"
 CREATE TABLE IF NOT EXISTS sensor_event (
   id TEXT PRIMARY KEY,
   workflow_id TEXT,
@@ -105,9 +100,8 @@ CREATE INDEX IF NOT EXISTS idx_sensor_event_type ON sensor_event(sensor_type);
 CREATE INDEX IF NOT EXISTS idx_sensor_event_agent ON sensor_event(agent_id);
 CREATE INDEX IF NOT EXISTS idx_sensor_event_passed ON sensor_event(passed);
 
-
 -- ----- Guides 规则表(CEO 可编辑) ----------------------------------
--- 武艺原话:"前馈控制就是设规则护栏,这个 AI 能干什么不能干什么"
+-- "前馈控制就是设规则护栏,这个 AI 能干什么不能干什么"
 CREATE TABLE IF NOT EXISTS guide_rule (
   id TEXT PRIMARY KEY,
   agent_id TEXT,                -- NULL = 全局规则,非 NULL = 特定岗位
@@ -122,7 +116,6 @@ CREATE TABLE IF NOT EXISTS guide_rule (
 
 CREATE INDEX IF NOT EXISTS idx_guide_rule_agent ON guide_rule(agent_id);
 CREATE INDEX IF NOT EXISTS idx_guide_rule_active ON guide_rule(is_active) WHERE is_active = 1;
-
 
 -- =================================================================
 -- 默认 Guides 规则(开箱即用 · CEO 后续可改)
@@ -182,7 +175,6 @@ VALUES (
   datetime('now'),
   datetime('now')
 );
-
 
 -- =================================================================
 -- 验证 schema 完整性

@@ -39,7 +39,6 @@ from .store import get_harness_store
 
 router = APIRouter(prefix="/api/harness", tags=["harness"])
 
-
 # ============================================================
 # Event Memory
 # ============================================================
@@ -59,7 +58,6 @@ def list_events(
         limit=limit,
     )
 
-
 @router.get("/events/{event_id}", response_model=EventMemory)
 def get_event(event_id: str):
     evt = get_harness_store().get_event(event_id)
@@ -67,11 +65,9 @@ def get_event(event_id: str):
         raise HTTPException(status_code=404, detail="Event not found")
     return evt
 
-
 @router.post("/events", response_model=EventMemory)
 def create_event(payload: EventMemoryCreate):
     return get_harness_store().create_event(payload)
-
 
 @router.post("/events/recall", response_model=list[EventMemoryRecallScore])
 def recall_events(
@@ -81,7 +77,7 @@ def recall_events(
     user_id: str = "ceo",
     limit: int = Query(default=5, le=20),
 ):
-    """召回 top-K · 武艺同款 · final_score = 0.4 衰减重要性 + 0.4 关键词 + 0.2 情绪。"""
+    """召回 top-K · 同款 · final_score = 0.4 衰减重要性 + 0.4 关键词 + 0.2 情绪。"""
     return get_harness_store().recall_top_k(
         agent_id=agent_id,
         query_text=query_text,
@@ -90,13 +86,11 @@ def recall_events(
         limit=limit,
     )
 
-
 @router.post("/events/sweep")
 def sweep_low_score_events(threshold: float = 2.0):
     """周期性扫描 · 把 decayed_importance < threshold 的事件标记 inactive。"""
     deactivated = get_harness_store().sweep_low_score_events(threshold=threshold)
     return {"deactivated_count": deactivated, "threshold": threshold}
-
 
 # ============================================================
 # Persona Perception · 17 岗位对 CEO 的认知
@@ -105,7 +99,6 @@ def sweep_low_score_events(threshold: float = 2.0):
 def list_personas(user_id: str = "ceo"):
     return get_harness_store().list_personas(user_id=user_id)
 
-
 @router.get("/personas/{agent_id}", response_model=PersonaPerception)
 def get_persona(agent_id: str, user_id: str = "ceo"):
     p = get_harness_store().get_persona(agent_id, user_id)
@@ -113,11 +106,9 @@ def get_persona(agent_id: str, user_id: str = "ceo"):
         raise HTTPException(status_code=404, detail="Persona not found")
     return p
 
-
 @router.post("/personas", response_model=PersonaPerception)
 def upsert_persona(payload: PersonaPerceptionCreate):
     return get_harness_store().upsert_persona(payload)
-
 
 # ============================================================
 # Relationship Node · 17 × CEO 关系坐标
@@ -126,7 +117,6 @@ def upsert_persona(payload: PersonaPerceptionCreate):
 def list_relationships(user_id: str = "ceo"):
     return get_harness_store().list_relationships(user_id=user_id)
 
-
 @router.get("/relationships/{agent_id}", response_model=RelationshipNode)
 def get_relationship(agent_id: str, user_id: str = "ceo"):
     r = get_harness_store().get_relationship(agent_id, user_id)
@@ -134,11 +124,9 @@ def get_relationship(agent_id: str, user_id: str = "ceo"):
         raise HTTPException(status_code=404, detail="Relationship not found")
     return r
 
-
 @router.post("/relationships", response_model=RelationshipNode)
 def upsert_relationship(payload: RelationshipNodeCreate):
     return get_harness_store().upsert_relationship(payload)
-
 
 # ============================================================
 # Sensors · 自进化日志
@@ -157,11 +145,9 @@ def list_sensor_events(
         limit=limit,
     )
 
-
 @router.post("/sensors", response_model=SensorEvent)
 def log_sensor(payload: SensorEventCreate):
     return get_harness_store().log_sensor(payload)
-
 
 # ============================================================
 # Guides · 规则
@@ -184,11 +170,9 @@ def list_guides(
         active_only=active_only,
     )
 
-
 @router.post("/guides", response_model=GuideRule)
 def create_guide(payload: GuideRuleCreate):
     return get_harness_store().create_guide(payload)
-
 
 @router.put("/guides/{guide_id}", response_model=GuideRule)
 def update_guide(guide_id: str, payload: GuideRuleUpdate):
@@ -197,14 +181,12 @@ def update_guide(guide_id: str, payload: GuideRuleUpdate):
         raise HTTPException(status_code=404, detail="Guide not found")
     return g
 
-
 @router.delete("/guides/{guide_id}")
 def delete_guide(guide_id: str):
     deleted = get_harness_store().delete_guide(guide_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Guide not found")
     return {"deleted": True}
-
 
 # ============================================================
 # Score Engine · 重要性 3 维评分 + 写入路由(W1 D3)
@@ -214,7 +196,6 @@ class ScoreRequest(BaseModel):
     agent_id: str = Field(min_length=1)
     prior_context: str = Field(default="", max_length=4000)
 
-
 class AutoRouteRequest(BaseModel):
     content: str = Field(min_length=1, max_length=4000)
     agent_id: str = Field(min_length=1)
@@ -223,13 +204,11 @@ class AutoRouteRequest(BaseModel):
     user_id: str = "ceo"
     prior_context: str = Field(default="", max_length=4000)
 
-
 class AutoRouteResponse(BaseModel):
     wrote: bool
     decision: str  # "kept_low_decay" | "kept_high_decay" | "discarded"
     score: ImportanceScore
     event: Optional[EventMemory] = None
-
 
 @router.post("/score", response_model=ImportanceScore)
 def score_endpoint(payload: ScoreRequest):
@@ -239,7 +218,6 @@ def score_endpoint(payload: ScoreRequest):
         agent_id=payload.agent_id,
         prior_context=payload.prior_context,
     )
-
 
 @router.post("/auto_route", response_model=AutoRouteResponse)
 def auto_route_endpoint(payload: AutoRouteRequest):
@@ -270,7 +248,6 @@ def auto_route_endpoint(payload: AutoRouteRequest):
         event=event,
     )
 
-
 # ============================================================
 # Sensors · 反馈控制器(W1 D6)· 手动触发用于面板/调试
 # ============================================================
@@ -279,7 +256,6 @@ class RunComplianceRequest(BaseModel):
     output: str = Field(min_length=1, max_length=8000)
     workflow_id: Optional[str] = None
     conversation_id: Optional[str] = None
-
 
 @router.post("/sensors/run/output_compliance", response_model=SensorEvent)
 def run_output_compliance(payload: RunComplianceRequest):
@@ -291,13 +267,11 @@ def run_output_compliance(payload: RunComplianceRequest):
         conversation_id=payload.conversation_id,
     )
 
-
 class RunHitRateRequest(BaseModel):
     agent_id: str = Field(min_length=1)
     workflow_id: Optional[str] = None
     conversation_id: Optional[str] = None
     recent_n: int = Field(default=10, ge=1, le=100)
-
 
 @router.post("/sensors/run/recall_hit_rate", response_model=SensorEvent)
 def run_recall_hit_rate(payload: RunHitRateRequest):
@@ -309,7 +283,6 @@ def run_recall_hit_rate(payload: RunHitRateRequest):
         recent_n=payload.recent_n,
     )
 
-
 class RunPersonaDriftRequest(BaseModel):
     agent_id: str = Field(min_length=1)
     current_output: str = Field(min_length=1, max_length=8000)
@@ -317,7 +290,6 @@ class RunPersonaDriftRequest(BaseModel):
     conversation_id: Optional[str] = None
     user_id: str = "ceo"
     history_limit: int = Field(default=5, ge=2, le=20)
-
 
 @router.post("/sensors/run/persona_drift", response_model=SensorEvent)
 def run_persona_drift(payload: RunPersonaDriftRequest):
@@ -331,7 +303,6 @@ def run_persona_drift(payload: RunPersonaDriftRequest):
         history_limit=payload.history_limit,
     )
 
-
 @router.post("/sensors/evolve")
 def run_evolve_thresholds(
     agent_id: Optional[str] = None,
@@ -342,7 +313,6 @@ def run_evolve_thresholds(
     触发的建议会落库 sensor_event(type=importance_calibration),前端面板可渲染。
     """
     return evolve_thresholds(agent_id=agent_id, sample_size=sample_size)
-
 
 # ============================================================
 # Prompt Assembler · Persona Core 三层拼装(W1 D4)
@@ -356,11 +326,10 @@ class AssemblePromptRequest(BaseModel):
     current_emotion: str = "neutral"
     recall_limit: int = Field(default=5, ge=1, le=20)
 
-
 @router.post("/assemble_prompt", response_model=PromptAssemblyResult)
 def assemble_prompt_endpoint(payload: AssemblePromptRequest):
     """
-    Persona Core 三层拼装(武艺同款 system / working / memory 分离):
+    Persona Core 三层拼装(同款 system / working / memory 分离):
       Layer 1 · system_prompt    永久人格 + 累积认知 + 关系坐标 + active guides
       Layer 2 · working_context  workflow + handoff
       Layer 3 · memory_recall    top-K 召回 + 当前 user_input
@@ -379,7 +348,6 @@ def assemble_prompt_endpoint(payload: AssemblePromptRequest):
         )
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
-
 
 # ============================================================
 # Dashboard · 七模块汇总(给前端首页 hero 用)
@@ -423,7 +391,6 @@ def get_dashboard(user_id: str = "ceo"):
             "avg_importance": avg_importance,
         },
     }
-
 
 @router.get("/health")
 def harness_health():

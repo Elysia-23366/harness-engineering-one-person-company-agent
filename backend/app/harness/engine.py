@@ -1,7 +1,7 @@
 """
 Harness Engine · 重要性 3 维评分 + 写入路由
 
-W1 D3 · 灵感:武艺《Harness Engineering 闭门分享 · 2026-04-28》三维打分机制
+W1 D3 · 灵感:三维打分机制
 
 核心思路:
   - 用 LLM 给一段 content 在 3 个维度各打 0-3 分(emotion / novelty / relation)
@@ -46,7 +46,6 @@ from .store import HarnessStore, get_harness_store
 
 logger = logging.getLogger(__name__)
 
-
 # ============================================================
 # Output schema · 给 routes / workflow hook 用
 # ============================================================
@@ -59,7 +58,6 @@ class ImportanceScore(BaseModel):
     emotion_tag: EmotionTag = "neutral"
     reasoning: str = ""
     used_fallback: bool = False  # True = 走的兜底,没真调到 LLM
-
 
 # ============================================================
 # Prompt 模板(系统侧)
@@ -96,7 +94,6 @@ total_score = emotion_score + novelty_score + relation_score(范围 0-9)。
 }
 """
 
-
 # ============================================================
 # Fallback · LLM 不可用时的默认评分
 # ============================================================
@@ -110,7 +107,6 @@ def _fallback_score(reason: str = "LLM 不可用,默认中等评分") -> Importa
         reasoning=reason,
         used_fallback=True,
     )
-
 
 # ============================================================
 # 主入口 · score_event_importance
@@ -170,7 +166,6 @@ def score_event_importance(
         )
         return _fallback_score("LLM 输出无法解析为 JSON")
     return parsed
-
 
 # ============================================================
 # JSON 解析 · 容忍 markdown 包裹 / 前后多余文字
@@ -238,14 +233,12 @@ def _parse_score(raw: str) -> Optional[ImportanceScore]:
     except Exception:  # noqa: BLE001
         return None
 
-
 def _clamp(v, lo: float, hi: float) -> float:
     try:
         f = float(v)
     except Exception:  # noqa: BLE001
         return lo
     return max(lo, min(hi, f))
-
 
 # ============================================================
 # 写入路由 · auto_route_event
@@ -262,7 +255,7 @@ def auto_route_event(
     """
     根据 3 维评分自动决定是否写入 event_memory + 用什么衰减率。
 
-    武艺原版阈值:
+    原版阈值:
       - total >= 6      → 写入,decay_rate=0.05(慢忘)
       - 3 <= total < 6  → 写入,decay_rate=0.10(快忘)
       - total < 3       → 不写
@@ -299,7 +292,6 @@ def auto_route_event(
     event = target_store.create_event(payload)
     return event, score
 
-
 # ============================================================
 # Workflow post-hook · 一键三库联动(W1 D5)
 # ============================================================
@@ -315,7 +307,6 @@ _REL_DELTA_BY_EMOTION: dict[str, tuple[float, float]] = {
 
 _PERSONA_CONFIDENCE_STEP = 0.02
 _PERSONA_CONFIDENCE_CAP = 0.95
-
 
 def post_hook_update_libraries(
     agent_id: str,
@@ -499,14 +490,12 @@ def post_hook_update_libraries(
         "errors": errors,
     }
 
-
 # ============================================================
 # Sensors · 反馈控制器(W1 D6)
-# 灵感:武艺《Harness Engineering》Sensors 自进化机制
+# 灵感:Sensors 自进化机制
 # ============================================================
 _COMPLIANCE_PASS_THRESHOLD = 0.8   # 至少 80% guides 通过才算合规
 _HIT_RATE_THRESHOLD = 0.5          # 至少 50% 事件被反复召回才算命中率达标
-
 
 def sensor_output_compliance(
     agent_id: str,
@@ -516,7 +505,7 @@ def sensor_output_compliance(
     store: Optional[HarnessStore] = None,
 ) -> SensorEvent:
     """
-    输出合规度 sensor · 武艺反馈控制器之一。
+    输出合规度 sensor · 反馈控制器之一。
 
     遍历该 agent 的所有 active Guides,逐条检查 output:
       - rule_type='output_schema'    · 检查 required_fields/keywords/pattern 是否出现
@@ -576,7 +565,6 @@ def sensor_output_compliance(
         },
     ))
 
-
 def sensor_recall_hit_rate(
     agent_id: str,
     workflow_id: Optional[str] = None,
@@ -585,7 +573,7 @@ def sensor_recall_hit_rate(
     store: Optional[HarnessStore] = None,
 ) -> SensorEvent:
     """
-    召回命中率 sensor · 武艺反馈控制器之二。
+    召回命中率 sensor · 反馈控制器之二。
 
     定义:取该 agent 最近 N 条 active 事件,统计被召回过的占比
          (access_count >= 1 视为有效命中)。
@@ -641,7 +629,6 @@ def sensor_recall_hit_rate(
         },
     ))
 
-
 # ============================================================
 # Single-guide checkers · 给 sensor_output_compliance 用
 # ============================================================
@@ -662,7 +649,6 @@ def _check_guide(g: GuideRule, output: str) -> GuideCheckResult:
         passed=True,
         detail=f"({g.rule_type} 规则 MVP 默认通过)",
     )
-
 
 def _check_output_schema(g: GuideRule, text: str) -> GuideCheckResult:
     """
@@ -732,7 +718,6 @@ def _check_output_schema(g: GuideRule, text: str) -> GuideCheckResult:
         matched_keywords=matched,
     )
 
-
 def _check_forbidden_topic(g: GuideRule, text: str) -> GuideCheckResult:
     """rule_content 是逗号或换行分隔的禁词列表。"""
     raw = (g.rule_content or "").replace("\n", ",")
@@ -745,7 +730,6 @@ def _check_forbidden_topic(g: GuideRule, text: str) -> GuideCheckResult:
         detail="未命中禁词" if passed else f"命中禁词: {', '.join(hit)}",
         matched_keywords=hit,
     )
-
 
 def _check_tone_constraint(g: GuideRule, text: str) -> GuideCheckResult:
     """
@@ -778,10 +762,8 @@ def _check_tone_constraint(g: GuideRule, text: str) -> GuideCheckResult:
         detail=f"中文字符 {zh_count}/{len(text)} ({ratio:.1%})",
     )
 
-
 # ============================================================
 # Persona Drift sensor + 自进化引擎(W1 D7)
-# 灵感:武艺 Sensors 自纠错闭环
 # ============================================================
 _DRIFT_SIM_THRESHOLD = 0.35     # 相似度低于此 → 漂移警报
 _DRIFT_HISTORY_LIMIT = 5
@@ -802,13 +784,11 @@ _STOPWORDS: set[str] = {
 # 复用 store.py 里同款 token 正则
 _TOKEN_RE_DRIFT = re.compile(r"[一-鿿]|[a-zA-Z0-9]+", re.UNICODE)
 
-
 def _token_freq(text: str) -> Counter:
     if not text:
         return Counter()
     raw = (t.lower() for t in _TOKEN_RE_DRIFT.findall(text))
     return Counter(t for t in raw if t and t not in _STOPWORDS)
-
 
 def _cosine_similarity(a: Counter, b: Counter) -> float:
     if not a or not b:
@@ -823,7 +803,6 @@ def _cosine_similarity(a: Counter, b: Counter) -> float:
         return 0.0
     return dot / (norm_a * norm_b)
 
-
 def sensor_persona_drift(
     agent_id: str,
     current_output: str,
@@ -835,7 +814,7 @@ def sensor_persona_drift(
     store: Optional[HarnessStore] = None,
 ) -> SensorEvent:
     """
-    Persona Drift sensor · 武艺自纠错闭环最关键的一环。
+    Persona Drift sensor · 自纠错闭环最关键的一环。
 
     取该 agent 最近 history_limit 条事件(代表"过去的人格语言风格"),
     跟 current_output 算 token 词频余弦相似度。
@@ -921,7 +900,6 @@ def sensor_persona_drift(
         },
     ))
 
-
 # ============================================================
 # 自进化引擎 · evolve_thresholds(W1 D7 闭环最后一棒)
 # ============================================================
@@ -931,7 +909,7 @@ def evolve_thresholds(
     store: Optional[HarnessStore] = None,
 ) -> dict:
     """
-    自进化引擎 · 武艺反馈控制器闭环。
+    自进化引擎 · 反馈控制器闭环。
 
     扫描最近 sample_size 条 sensor_event,如果某个维度持续低于目标阈值,
     生成"调整建议"并落库一条 importance_calibration 记录(给前端面板演示用)。

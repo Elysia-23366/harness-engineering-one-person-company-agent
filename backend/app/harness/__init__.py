@@ -1,5 +1,5 @@
 """
-Harness Engineering 模块 · 灵感:武艺《Harness Engineering 闭门分享 · 2026-04-28》
+Harness Engineering 模块
 
 公式:Agent = Model + Harness
 

@@ -1,6 +1,6 @@
 <script setup>
 /**
- * GuidesPanel · 武艺《Harness Engineering》前馈控制面板(W2 D8)
+ * GuidesPanel · 前馈控制面板(W2 D8)
  *
  * 设计意图:让 CEO 直接看到/编辑 17 岗位的"前馈规则",视觉沿用 Claude.ai 暖米白调性。
  * 数据源:GET/POST/PUT/DELETE /api/harness/guides

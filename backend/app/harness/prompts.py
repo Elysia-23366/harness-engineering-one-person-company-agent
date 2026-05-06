@@ -1,7 +1,7 @@
 """
 Harness Prompts · Persona Core 三层 prompt 拼装器
 
-W1 D4 · 灵感:武艺《Harness Engineering 闭门分享 · 2026-04-28》Persona Core 三层分离
+W1 D4 · 灵感:Persona Core 三层分离
 
 三层逻辑:
   Layer 1 · system_prompt    永久人格   · agent.system_prompt(§0 对标 + 信条)
@@ -34,7 +34,6 @@ from .schemas import (
 )
 from .store import HarnessStore, get_harness_store
 
-
 # ============================================================
 # Output schema
 # ============================================================
@@ -45,7 +44,6 @@ class PromptAssemblyResult(BaseModel):
     full_prompt: str  # system + "\n\n" + user · 给 call_llm 单字符串接口
     messages: list[dict[str, str]]
     harness_context: HarnessContext
-
 
 # ============================================================
 # 主入口 · assemble_persona_prompt
@@ -61,7 +59,7 @@ def assemble_persona_prompt(
     harness_store: Optional[HarnessStore] = None,
 ) -> PromptAssemblyResult:
     """
-    Persona Core 三层拼装 · 武艺同款 system / working / memory 分离。
+    Persona Core 三层拼装 · 同款 system / working / memory 分离。
 
     Args:
         agent_id: 必填,要拼哪个岗位的 prompt
@@ -160,7 +158,6 @@ def assemble_persona_prompt(
         harness_context=harness_context,
     )
 
-
 # ============================================================
 # Format helpers · 每段都用 "—— 段名 ——" 分隔,LLM 和前端都好读
 # ============================================================
@@ -175,7 +172,6 @@ def _format_persona_block(p: PersonaPerception) -> str:
     )
     return "\n".join(lines)
 
-
 def _format_relationship_block(r: RelationshipNode) -> str:
     return (
         "—— 你与 CEO 的关系坐标(永久,每对独立)——\n"
@@ -183,7 +179,6 @@ def _format_relationship_block(r: RelationshipNode) -> str:
         f"对齐 {r.alignment_score:.2f} · 协作 {r.collaboration_count} 次 · "
         f"阶段 {r.current_phase}"
     )
-
 
 def _format_guides_block(guides: list[GuideRule]) -> str:
     lines = ["—— Active Guides(前馈规则,必须遵守)——"]
@@ -195,7 +190,6 @@ def _format_guides_block(guides: list[GuideRule]) -> str:
         )
     return "\n".join(lines)
 
-
 def _format_recall_block(recalled: list[EventMemoryRecallScore]) -> str:
     lines = [f"—— 相关历史召回(top-{len(recalled)} · 关键词+情绪+衰减加权)——"]
     for i, s in enumerate(recalled, 1):
@@ -206,7 +200,6 @@ def _format_recall_block(recalled: list[EventMemoryRecallScore]) -> str:
             f"final={s.final_score:.3f}] {content_short}"
         )
     return "\n".join(lines)
-
 
 def _format_handoffs_block(handoffs: list[dict[str, str]]) -> str:
     lines = ["—— 上一棒交接 ——"]

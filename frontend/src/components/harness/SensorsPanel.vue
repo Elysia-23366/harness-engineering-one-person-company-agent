@@ -1,6 +1,6 @@
 <script setup>
 /**
- * SensorsPanel · 武艺《Harness Engineering》反馈控制面板(W2 D9)
+ * SensorsPanel · 反馈控制面板(W2 D9)
  *
  * 显示 sensor_event 时间线 + tab 切换:
  *   - 全部 / recall_hit_rate / output_compliance / persona_drift / importance_calibration
