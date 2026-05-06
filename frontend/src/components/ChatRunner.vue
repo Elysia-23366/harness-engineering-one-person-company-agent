@@ -3,6 +3,7 @@ import { MessageSquare, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRig
 import { inject, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { marked } from "marked";
 import { I18N_KEY } from "../i18n";
+import ArtifactCard from "./ArtifactCard.vue";
 
 const props = defineProps({
   selectedWorkflowId: {
@@ -153,6 +154,7 @@ watch(
               <div v-if="message.role === 'user'">{{ message.content }}</div>
               <div v-else v-html="renderMarkdown(message.content)"></div>
             </div>
+            <ArtifactCard v-if="message.role !== 'user' && message.content" :content="message.content" />
           </div>
         </div>
 

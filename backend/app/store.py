@@ -1782,7 +1782,23 @@ class SQLitePlaygroundStore:
                     "- 只有在真实受阻、缺少必要信息或明确不属于当前任务时，才保留未完成项，并明确说明原因；\n"
                     "- 不要把静态界面、视觉壳子、未接线的结构、占位逻辑或半成品当作完成；\n"
                     "- 指出技术风险、复杂度与前置条件；\n"
-                    "- 需要时补充代码、命令或文件级说明。"
+                    "- 需要时补充代码、命令或文件级说明。\n"
+                    "\n"
+                    "📦 文件交付协议(必须遵守):\n"
+                    "当你输出可执行/可下载文件时,严格按以下格式:\n"
+                    "1) 在每个代码块前一行,写一行 `📄 文件: <文件名.扩展名>`(中文冒号或英文冒号都可)\n"
+                    "2) 紧接着用 ``` 三反引号 + 语言标识 包裹完整内容\n"
+                    "3) 一次任务可输出多个文件,每个都按上面格式独立标注\n"
+                    "示例:\n"
+                    "📄 文件: calculator.html\n"
+                    "```html\n"
+                    "<!DOCTYPE html><html>...</html>\n"
+                    "```\n"
+                    "📄 文件: style.css\n"
+                    "```css\n"
+                    "body { ... }\n"
+                    "```\n"
+                    "前端会扫描这种格式自动生成下载按钮,所以**文件名必须真实可用**(后缀正确、不含路径前缀如 / 或 ./)。"
                 ),
                 "skill_names": ["Structured Reasoning", "Risk Review"],
             },
@@ -1848,6 +1864,28 @@ class SQLitePlaygroundStore:
                     )
                 )
             agents = self.list_agents()
+
+        # 强制刷新含"📦 文件交付协议"的 agent prompt(给已存在的旧 agent 升级)
+        artifact_marker = "📦 文件交付协议"
+        spec_by_name_for_marker = {spec["name"]: spec for spec in default_agent_specs}
+        for agent in agents:
+            spec = spec_by_name_for_marker.get(agent.name)
+            if not spec:
+                continue
+            spec_prompt = spec.get("system_prompt", "")
+            if artifact_marker in spec_prompt and artifact_marker not in (agent.system_prompt or ""):
+                self.update_agent(
+                    agent.id,
+                    AgentDefinitionUpdate(
+                        name=spec["name"],
+                        description=spec["description"],
+                        system_prompt=spec_prompt,
+                        model=agent.model,
+                        skill_ids=agent.skill_ids,
+                        builtin_capabilities=agent.builtin_capabilities,
+                    ),
+                )
+        agents = self.list_agents()
 
         spec_by_name = {spec["name"]: spec for spec in default_agent_specs}
         for agent in agents:
